@@ -1,4 +1,4 @@
-package metaedit
+package postmeta
 
 class MetaPostEditor{
 	def metaPostFilePath
