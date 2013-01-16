@@ -9,10 +9,19 @@ class MetaPostWindow {
 	def swingBuilder
 	def swingWindow
 	def editWindow
+	def fileOpen
+	def fileDirty
+	def fileObject
+	def fileChan
 	
-	MetaPostWindow(def x, def y, def file)
+	def subscribersFileOpen = []
+	def subscribersFileName = []
+	
+	MetaPostWindow(def x, def y, def fileP)
 	{
-		filePath = file
+		filePath = fileP
+		fileOpen = false
+		fileDirty = false
 		swingBuilder = new SwingBuilder()
 		swingWindow = swingBuilder.frame(title: "PostMeta", size:[x, y],
 			show:true, defaultCloseOperation: JFrame.EXIT_ON_CLOSE){
@@ -38,9 +47,8 @@ class MetaPostWindow {
 				editWindow = textArea(visible:true, editable:true, text:"some oul text")
 			}
 		}
-
-		displayFile()	
-		
+		if (displayFile())
+			fileOpenOrClose()	
 	}
 	
 	def seeEPS()
@@ -50,6 +58,9 @@ class MetaPostWindow {
 	
 	def loadFile()
 	{
+		if (fileOpen && fileDirty)
+			if (closeDirtyFile() == false)
+				return
 		def loadDialog = swingBuilder.fileChooser(
 			dialogTitle: "Choose a MetaPost file to open"
 		)
@@ -58,17 +69,33 @@ class MetaPostWindow {
 		changeFileName()
 	}
 	
+	def closeDirtyFile()
+	{
+		fileOpen = false
+		fileDirty = false
+		fileOpenOrClose()
+		return true
+	}
+	
 	def changeFileName()
 	{
-		
+		changeFilePath()
 	}
 	
 	def displayFile()
 	{
+		filePath = filePath.trim()
 		if (filePath.size() == 0)
-			return
-		
-		
+			return false
+		try {
+			fileObject = new RandomAccessFile(filePath, "rw")
+			fileChan = randomFile.getChannel()
+			fileChan.position(0)
+		}
+		catch(e)
+		{
+			println "Unable to open $filePath, exception $e"
+		}
 	}
 	
 	def displayGPL()
@@ -97,5 +124,37 @@ class MetaPostWindow {
 		gPLDialog.pack()
 		gPLDialog.show()
 	}
+	
+	//code to allow subscribers to be updated on file status
+	void subscribeFileOpen(def subscriber)
+	{
+		susbcribersFileOpen -= subscriber
+		subscribersFileOpen << subscriber
+	}
+	
+	void subscribeFilePath(def subscriber)
+	{
+		susbcribersFilePath -= subscriber
+		subscribersFilePath << subscriber
+	}
 
+	void unsubscribeFileOpen(def subscriber)
+	{
+		subscribersFileOpen -= subscriber
+	}
+	
+	void unsubscribeFilePath(def subscriber)
+	{
+		subscribersFilePath -= subscriber
+	}
+	
+	void changeFilePath()
+	{
+		subscribersFilePath.each{it.updateFilePath(filePath)}
+	}
+	
+	void fileOpenOrClose()
+	{
+		susbcribersFileOpen.each{it.updateFileOpenOrClose(fileOpen)}
+	}
 }
