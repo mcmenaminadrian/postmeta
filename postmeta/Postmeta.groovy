@@ -14,8 +14,6 @@ class MetaPostEditor{
 		return 0
 	}
 	
-	
-	
 }
 
 def metaCli = new CliBuilder

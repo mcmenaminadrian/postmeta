@@ -37,11 +37,9 @@ class MetaPostWindow {
 			scrollPane(constraints:BL.LINE_START) {
 				editWindow = textArea(visible:true, editable:true, text:"some oul text")
 			}
-			
-			
 		}
-		
-		
+
+		displayFile()	
 		
 	}
 	
@@ -62,6 +60,14 @@ class MetaPostWindow {
 	
 	def changeFileName()
 	{
+		
+	}
+	
+	def displayFile()
+	{
+		if (filePath.size() == 0)
+			return
+		
 		
 	}
 	
