@@ -15,7 +15,7 @@ class MetaPostWindow {
 		filePath = file
 		swingBuilder = new SwingBuilder()
 		swingWindow = swingBuilder.frame(title: "PostMeta", size:[x, y],
-			show:true){
+			show:true, defaultCloseOperation: JFrame.EXIT_ON_CLOSE){
 			def BL = borderLayout()
 			menuBar(){
 				menu(text: "File", mnemonic: 'F'){
@@ -78,11 +78,15 @@ class MetaPostWindow {
 		"\nFree Software Foundation; either version 3 of the" +
 		"\nlicence, or (at your option) any later version.\n";
 		
-		def gPLDialog = swingBuilder.frame(title: "Licence terms",
+		def gPLDialog
+		
+		gPLDialog = swingBuilder.frame(title: "Licence terms",
 			size: [320, 200]) {
 			def BL = borderLayout()
 			scrollPane(constraints: BL.CENTER){
-				textArea(text: message)}
+				textArea(text: message, editable:false)}
+			button(constraints: BL.SOUTH, defaultButton:true,
+				action: action(name:'OK', closure:{gPLDialog.dispose()}))
 		}
 		gPLDialog.pack()
 		gPLDialog.show()
