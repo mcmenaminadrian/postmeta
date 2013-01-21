@@ -2,6 +2,7 @@ package postmeta
 
 import groovy.swing.SwingBuilder
 import javax.swing.*
+import java.awt.Dimension
 
 class MetaPostWindow {
 	
@@ -15,7 +16,7 @@ class MetaPostWindow {
 	def fileChan
 	
 	def subscribersFileOpen = []
-	def subscribersFileName = []
+	def subscribersFilePath = []
 	
 	MetaPostWindow(def x, def y, def fileP)
 	{
@@ -44,9 +45,10 @@ class MetaPostWindow {
 			}
 			
 			scrollPane(constraints:BL.LINE_START) {
-				editWindow = textArea(visible:true, editable:true, text:"some oul text")
+				editWindow = textArea(visible:true, editable:true)
 			}
 		}
+		editWindow.setPreferredSize(new Dimension((int)x/2, (int)y/2))
 		if (displayFile())
 			fileOpenOrClose()	
 	}
@@ -65,7 +67,7 @@ class MetaPostWindow {
 			dialogTitle: "Choose a MetaPost file to open"
 		)
 		loadDialog.showOpenDialog()
-		filePath = loadDialog.getSelectedFile()
+		filePath = loadDialog.getSelectedFile().getPath()
 		changeFileName()
 	}
 	
@@ -80,22 +82,27 @@ class MetaPostWindow {
 	def changeFileName()
 	{
 		changeFilePath()
+		//handle save etc
+		displayFile()
 	}
 	
 	def displayFile()
 	{
-		filePath = filePath.trim()
-		if (filePath.size() == 0)
-			return false
-		try {
-			fileObject = new RandomAccessFile(filePath, "rw")
-			fileChan = randomFile.getChannel()
-			fileChan.position(0)
+		if (filePath) {
+			filePath = filePath.trim()
+			if (filePath.size() == 0)
+				return false
+				try {
+					fileObject = new FileReader(filePath)
+					editWindow.read(fileObject, "$filePath")
+					
+				}
+				catch(e)
+				{
+					println "Unable to open $filePath, exception $e"
+				}
 		}
-		catch(e)
-		{
-			println "Unable to open $filePath, exception $e"
-		}
+		return true
 	}
 	
 	def displayGPL()
@@ -155,6 +162,6 @@ class MetaPostWindow {
 	
 	void fileOpenOrClose()
 	{
-		susbcribersFileOpen.each{it.updateFileOpenOrClose(fileOpen)}
+		subscribersFileOpen.each{it.updateFileOpenOrClose(fileOpen)}
 	}
 }
