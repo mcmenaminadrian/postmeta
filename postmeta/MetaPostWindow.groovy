@@ -48,7 +48,7 @@ class MetaPostWindow {
 				editWindow = textArea(visible:true, editable:true)
 			}
 		}
-		editWindow.setPreferredSize(new Dimension((int)x/2, (int)y/2))
+		
 		if (displayFile())
 			fileOpenOrClose()	
 	}
