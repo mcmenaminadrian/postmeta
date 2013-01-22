@@ -10,9 +10,9 @@ class MetaPostWindow {
 	def swingBuilder
 	def swingWindow
 	def editWindow
+	def scrollingPane
 	def fileOpen
 	def fileDirty
-	def fileObject
 	def fileChan
 	
 	def subscribersFileOpen = []
@@ -25,7 +25,7 @@ class MetaPostWindow {
 		fileDirty = false
 		swingBuilder = new SwingBuilder()
 		swingWindow = swingBuilder.frame(title: "PostMeta", size:[x, y],
-			show:true, defaultCloseOperation: JFrame.EXIT_ON_CLOSE){
+			defaultCloseOperation: JFrame.EXIT_ON_CLOSE, show:true){
 			def BL = borderLayout()
 			menuBar(){
 				menu(text: "File", mnemonic: 'F'){
@@ -43,11 +43,11 @@ class MetaPostWindow {
 						actionPerformed: {displayGPL()})
 				}
 			}
-			
-			scrollPane(constraints:BL.LINE_START) {
-				editWindow = textArea(visible:true, editable:true)
+			scrollingPane = scrollPane(){
+				editWindow = editorPane(editable:true, dragEnabled:true)
 			}
 		}
+		
 		
 		if (displayFile())
 			fileOpenOrClose()	
@@ -93,9 +93,8 @@ class MetaPostWindow {
 			if (filePath.size() == 0)
 				return false
 				try {
-					fileObject = new FileReader(filePath)
-					editWindow.read(fileObject, "$filePath")
 					
+					editWindow.setPage("file://$filePath")
 				}
 				catch(e)
 				{
